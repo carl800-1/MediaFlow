@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: CARL800/mediaflow
+  IMAGE_NAME: carl800-1/mediaflow
 
 jobs:
   build:
