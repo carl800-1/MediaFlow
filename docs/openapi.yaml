@@ -1,0 +1,359 @@
+openapi: 3.0.3
+info:
+  title: MediaFlow API
+  description: 新一代NAS媒体库智能管理系统 API
+  version: 1.0.0
+  contact:
+    name: MediaFlow Team
+servers:
+  - url: http://localhost:3000/api
+    description: 本地开发服务器
+
+paths:
+  /health:
+    get:
+      summary: 健康检查
+      tags:
+        - System
+      responses:
+        '200':
+          description: 服务正常运行
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  service:
+                    type: string
+
+  /system/info:
+    get:
+      summary: 获取系统信息
+      tags:
+        - System
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  version:
+                    type: string
+                  description:
+                    type: string
+
+  /system/config:
+    get:
+      summary: 获取系统配置
+      tags:
+        - System
+      responses:
+        '200':
+          description: 成功
+
+  /brushtask/:
+    get:
+      summary: 获取所有刷流任务
+      tags:
+        - BrushTask
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功
+    post:
+      summary: 创建刷流任务
+      tags:
+        - BrushTask
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                site_id:
+                  type: integer
+                downloader_id:
+                  type: integer
+                interval:
+                  type: string
+                filter_rule:
+                  type: string
+      responses:
+        '200':
+          description: 创建成功
+
+  /brushtask/{task_id}:
+    get:
+      summary: 获取指定任务
+      tags:
+        - BrushTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+    put:
+      summary: 更新任务
+      tags:
+        - BrushTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 更新成功
+    delete:
+      summary: 删除任务
+      tags:
+        - BrushTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 删除成功
+
+  /brushtask/{task_id}/start:
+    post:
+      summary: 启动任务
+      tags:
+        - BrushTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 启动成功
+
+  /brushtask/{task_id}/stop:
+    post:
+      summary: 停止任务
+      tags:
+        - BrushTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 停止成功
+
+  /downloader/:
+    get:
+      summary: 获取所有下载器
+      tags:
+        - Downloader
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功
+    post:
+      summary: 添加下载器
+      tags:
+        - Downloader
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                type:
+                  type: string
+                  enum: [qbittorrent, transmission, aria2]
+                host:
+                  type: string
+                port:
+                  type: integer
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: 添加成功
+
+  /search/:
+    get:
+      summary: 搜索资源
+      tags:
+        - Search
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: keyword
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: media_type
+          in: query
+          schema:
+            type: string
+            enum: [movie, tv]
+        - name: year
+          in: query
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: 成功
+
+  /site/:
+    get:
+      summary: 获取所有站点
+      tags:
+        - Site
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功
+    post:
+      summary: 添加站点
+      tags:
+        - Site
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                url:
+                  type: string
+                cookie:
+                  type: string
+                sign_url:
+                  type: string
+                rss_url:
+                  type: string
+      responses:
+        '200':
+          description: 添加成功
+
+  /site/{site_id}/signin:
+    post:
+      summary: 站点签到
+      tags:
+        - Site
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: site_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 签到成功
+
+  /site/signin/all:
+    post:
+      summary: 批量签到
+      tags:
+        - Site
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 签到完成
+
+  /subscription/:
+    get:
+      summary: 获取所有订阅
+      tags:
+        - Subscription
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功
+    post:
+      summary: 创建订阅
+      tags:
+        - Subscription
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                rss_url:
+                  type: string
+                downloader_id:
+                  type: integer
+                keywords:
+                  type: string
+      responses:
+        '200':
+          description: 创建成功
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

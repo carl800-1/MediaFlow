@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaFlow - 媒体库管理系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-film"></i>
+                <span>MediaFlow</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>仪表盘</span>
+                </a>
+                <a href="#" class="nav-item" data-page="brushtask">
+                    <i class="fas fa-sync"></i>
+                    <span>刷流任务</span>
+                </a>
+                <a href="#" class="nav-item" data-page="search">
+                    <i class="fas fa-search"></i>
+                    <span>媒体搜索</span>
+                </a>
+                <a href="#" class="nav-item" data-page="subscription">
+                    <i class="fas fa-rss"></i>
+                    <span>RSS订阅</span>
+                </a>
+                <a href="#" class="nav-item" data-page="downloader">
+                    <i class="fas fa-cloud-download-alt"></i>
+                    <span>下载器</span>
+                </a>
+                <a href="#" class="nav-item" data-page="sites">
+                    <i class="fas fa-globe"></i>
+                    <span>站点管理</span>
+                </a>
+                <a href="#" class="nav-item" data-page="sync">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>文件同步</span>
+                </a>
+                <a href="#" class="nav-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>设置</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <span class="status-dot online"></span>
+                    <span>系统正常</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="page-title">
+                    <h1 id="pageTitle">仪表盘</h1>
+                </div>
+                <div class="top-actions">
+                    <button class="btn-icon" title="刷新">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="btn-icon" title="通知">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                    <div class="user-menu">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-area" id="contentArea">
+                <div class="page" id="pageDashboard">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statTasks">0</h3>
+                                <p>运行任务</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statTorrents">0</h3>
+                                <p>种子数量</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon orange">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statSites">0</h3>
+                                <p>管理站点</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon purple">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statUptime">0h</h3>
+                                <p>运行时间</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>最近活动</h2>
+                                <a href="#" class="link">查看全部</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="activity-list" id="activityList">
+                                    <div class="activity-item">
+                                        <i class="fas fa-check-circle success"></i>
+                                        <span>站点 MTEAM 签到成功</span>
+                                        <small>5分钟前</small>
+                                    </div>
+                                    <div class="activity-item">
+                                        <i class="fas fa-download info"></i>
+                                        <span>下载任务完成: 电影名</span>
+                                        <small>10分钟前</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>下载速度</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="speed-chart" id="speedChart">
+                                    <div class="speed-info">
+                                        <div class="speed-item">
+                                            <i class="fas fa-arrow-down"></i>
+                                            <span id="downloadSpeed">0 MB/s</span>
+                                        </div>
+                                        <div class="speed-item">
+                                            <i class="fas fa-arrow-up"></i>
+                                            <span id="uploadSpeed">0 MB/s</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page hidden" id="pageBrushtask">
+                    <div class="page-header">
+                        <button class="btn btn-primary" id="addBrushtask">
+                            <i class="fas fa-plus"></i> 新建任务
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>任务名称</th>
+                                    <th>站点</th>
+                                    <th>下载器</th>
+                                    <th>状态</th>
+                                    <th>已下载</th>
+                                    <th>正在做种</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="brushtaskTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="page hidden" id="pageSearch">
+                    <div class="search-container">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="搜索电影、剧集...">
+                            <select id="searchType">
+                                <option value="">全部</option>
+                                <option value="movie">电影</option>
+                                <option value="tv">剧集</option>
+                            </select>
+                            <button class="btn btn-primary" id="searchBtn">搜索</button>
+                        </div>
+                    </div>
+                    <div class="search-results" id="searchResults">
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <p>输入关键词开始搜索</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page hidden" id="pageSubscription">
+                    <div class="page-header">
+                        <button class="btn btn-primary" id="addSubscription">
+                            <i class="fas fa-plus"></i> 新建订阅
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>订阅名称</th>
+                                    <th>RSS地址</th>
+                                    <th>下载器</th>
+                                    <th>状态</th>
+                                    <th>自动下载</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subscriptionTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="page hidden" id="pageDownloader">
+                    <div class="downloader-grid" id="downloaderGrid">
+                    </div>
+                </div>
+
+                <div class="page hidden" id="pageSites">
+                    <div class="page-header">
+                        <button class="btn btn-primary" id="addSite">
+                            <i class="fas fa-plus"></i> 添加站点
+                        </button>
+                        <button class="btn btn-success" id="signinAll">
+                            <i class="fas fa-sign-in-alt"></i> 批量签到
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>站点名称</th>
+                                    <th>URL</th>
+                                    <th>用户等级</th>
+                                    <th>魔力值</th>
+                                    <th>上传量</th>
+                                    <th>下载量</th>
+                                    <th>分享率</th>
+                                    <th>做种数</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sitesTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="page hidden" id="pageSync">
+                    <div class="page-header">
+                        <button class="btn btn-primary" id="addSync">
+                            <i class="fas fa-plus"></i> 新建同步任务
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>任务名称</th>
+                                    <th>源路径</th>
+                                    <th>目标路径</th>
+                                    <th>方向</th>
+                                    <th>状态</th>
+                                    <th>最后同步</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="syncTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="page hidden" id="pageSettings">
+                    <div class="settings-tabs">
+                        <button class="tab-btn active" data-tab="general">基本设置</button>
+                        <button class="tab-btn" data-tab="notification">通知设置</button>
+                        <button class="tab-btn" data-tab="downloader">下载器设置</button>
+                        <button class="tab-btn" data-tab="about">关于</button>
+                    </div>
+                    <div class="settings-content">
+                        <div class="tab-content active" id="tabGeneral">
+                            <div class="form-group">
+                                <label>服务端口</label>
+                                <input type="number" id="settingPort" value="3000">
+                            </div>
+                            <div class="form-group">
+                                <label>时区</label>
+                                <select id="settingTimezone">
+                                    <option value="Asia/Shanghai">Asia/Shanghai</option>
+                                    <option value="Asia/Tokyo">Asia/Tokyo</option>
+                                    <option value="UTC">UTC</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" id="saveGeneral">保存设置</button>
+                        </div>
+                        <div class="tab-content" id="tabNotification">
+                            <div class="form-group">
+                                <label>Telegram Bot Token</label>
+                                <input type="password" id="telegramToken" placeholder="输入Token">
+                            </div>
+                            <div class="form-group">
+                                <label>Telegram Chat ID</label>
+                                <input type="text" id="telegramChatId" placeholder="输入Chat ID">
+                            </div>
+                            <button class="btn btn-secondary" id="testNotification">测试通知</button>
+                            <button class="btn btn-primary" id="saveNotification">保存设置</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal" id="modalContainer">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">弹窗标题</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+            <div class="modal-footer" id="modalFooter">
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

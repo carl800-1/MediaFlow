@@ -1,0 +1,45 @@
+# Docker
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+ENV/
+.eggs/
+
+# 测试
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# 文档
+*.md
+!README.md
+docs/
+
+# 其他
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.local

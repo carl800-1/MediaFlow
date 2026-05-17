@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  mediaflow:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: mediaflow
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../data:/app/data
+      - ../logs:/app/logs
+      - ../config:/app/config:ro
+    environment:
+      - MEDIAFLOW_CONFIG=/app/config/config.yaml
+      - MEDIAFLOW_PORT=3000
+      - MEDIAFLOW_HOST=0.0.0.0
+    networks:
+      - mediaflow-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: mediaflow-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - mediaflow-network
+
+networks:
+  mediaflow-network:
+    driver: bridge
+
+volumes:
+  redis-data:
