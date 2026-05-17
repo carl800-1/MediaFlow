@@ -50,12 +50,11 @@ docs/
 !requirements.txt
 
 # Docker
-docker/
-Dockerfile
 docker-compose*.yml
 
 # CI/CD
 .github/
+!.github/workflows/
 .travis.yml
 .gitlab-ci.yml
 
