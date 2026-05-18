@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mediaflow"
-version = "1.0.0"
+version = "5.0.8"
 description = "新一代NAS媒体库智能管理系统"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -23,14 +23,132 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Topic :: Multimedia :: Video",
 ]
-
 dependencies = [
-    "requests>=2.31.0",
-    "pyyaml>=6.0",
-    "loguru>=0.7.0",
+    "alembic>=1.11.0",
+    "aniso8601>=9.0.0",
+    "anitopy>=2.1.0",
+    "APScheduler>=3.10.0",
+    "asttokens>=2.2.0",
+    "async-generator>=1.10",
+    "attrs>=23.1.0",
+    "backcall>=0.2.0",
+    "backports.shutil-get-terminal-size>=1.0.0",
+    "beautifulsoup4>=4.12.0",
+    "better-exceptions>=0.3.0",
+    "bs4>=0.0.1",
+    "cacheout>=0.14.0",
+    "cachetools>=5.3.0",
+    "certifi>=2023.7.0",
+    "cffi>=1.15.0",
+    "chardet>=5.2.0",
+    "charset-normalizer>=3.2.0",
+    "click>=8.1.0",
+    "cn2an>=0.5.0",
+    "colorama>=0.4.0",
+    "colored>=1.3.0",
+    "cryptography>=41.0.0",
+    "cssselect>=1.2.0",
+    "DBUtils>=3.0.0",
+    "dateparser>=1.1.0",
+    "decorator>=5.1.0",
+    "executing>=1.2.0",
     "feedparser>=6.0.0",
-    "apscheduler>=3.10.0",
+    "Flask>=2.3.0",
+    "Flask-Login>=0.6.0",
+    "flask-compress>=1.14",
+    "flask-cors>=4.0.0",
+    "flask-restx>=1.1.0",
+    "flask-sock>=0.6.0",
+    "func_timeout>=4.3.0",
+    "greenlet>=2.0.0",
+    "guessit>=3.7.0",
+    "h11>=0.14.0",
+    "humanize>=4.7.0",
+    "icalendar>=5.0.0",
+    "idna>=3.4",
+    "influxdb>=5.3.0",
+    "iso639>=0.1.0",
+    "itsdangerous>=2.1.0",
+    "jedi>=0.19.0",
+    "jellyfish>=1.0.0",
+    "Jinja2>=3.1.0",
+    "jsonpath>=0.82",
+    "jsonschema>=4.19.0",
+    "loguru>=0.7.0",
+    "lxml>=4.9.0",
+    "Mako>=1.2.0",
+    "MarkupSafe>=2.1.0",
+    "matplotlib-inline>=0.1.0",
+    "msgpack>=1.0.0",
+    "openai>=0.28.0",
+    "outcome>=1.2.0",
+    "parse>=1.19.0",
+    "parsel>=1.8.0",
+    "parso>=0.8.0",
+    "pexpect>=4.8.0",
+    "pickleshare>=0.7.0",
+    "pikpakapi>=0.1.0",
+    "pillow>=10.0.0",
+    "PlexAPI>=4.15.0",
+    "proces>=0.1.0",
+    "prompt-toolkit>=3.0.0",
+    "psutil>=5.9.0",
+    "ptyprocess>=0.7.0",
+    "pure-eval>=0.2.0",
+    "pycparser>=2.21",
+    "pycryptodome>=3.18.0",
+    "Pygments>=2.16.0",
+    "PyJWT>=2.8.0",
+    "pymongo>=4.4.0",
+    "PyMySQL>=1.1.0",
+    "pyperclip>=1.8.0",
+    "pypushdeer>=0.0.0",
+    "pyquery>=2.0.0",
+    "pyrsistent>=0.19.0",
+    "PySocks>=1.7.0",
     "python-dateutil>=2.8.0",
+    "python-dotenv>=1.0.0",
+    "python_hosts>=1.0.0",
+    "pytz>=2023.3",
+    "pytz-deprecation-shim>=0.1.0",
+    "PyVirtualDisplay>=3.0",
+    "pyyaml>=6.0",
+    "qbittorrent-api>=2023.9.0",
+    "redis>=5.0.0",
+    "regex>=2023.8.0",
+    "requests>=2.31.0",
+    "ruamel.yaml>=0.17.32",
+    "ruamel.yaml.clib>=0.2.0",
+    "selenium>=4.0.0",
+    "six>=1.16.0",
+    "slack-bolt>=1.18.0",
+    "slack-sdk>=3.21.0",
+    "sniffio>=1.3.0",
+    "sortedcontainers>=2.4.0",
+    "soupsieve>=2.4.0",
+    "SQLAlchemy>=2.0.0",
+    "srt>=3.5.0",
+    "stack-data>=0.6.0",
+    "terminal-layout>=2.1.0",
+    "tqdm>=4.66.0",
+    "traitlets>=5.9.0",
+    "transmission-rpc>=6.0.0",
+    "trio>=0.22.0",
+    "trio-websocket>=0.10.0",
+    "typing_extensions>=4.7.0",
+    "tzdata>=2023.3",
+    "tzlocal>=5.0.0",
+    "undetected-chromedriver>=3.5.0",
+    "urllib3>=2.0.0",
+    "w3lib>=2.1.0",
+    "watchdog>=3.0.0",
+    "wcwidth>=0.2.0",
+    "webdriver-manager>=4.0.0",
+    "websockets>=11.0.0",
+    "Werkzeug>=2.3.0",
+    "wsproto>=1.2.0",
+    "zhconv>=1.4.0",
+    "bencode.py>=4.0.0",
 ]
 
 [project.optional-dependencies]
@@ -68,12 +186,12 @@ exclude = '''
 line-length = 100
 target-version = "py310"
 select = [
-    "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings
-    "F",   # pyflakes
-    "I",   # isort
-    "C",   # flake8-comprehensions
-    "B",   # flake8-bugbear
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
 ]
 ignore = [
     "E501",  # line too long (handled by black)
