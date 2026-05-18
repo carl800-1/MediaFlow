@@ -1,5 +1,5 @@
-# MediaFlow Dockerfile - 修复版
-# 多阶段构建优化，确保 ruamel.yaml 正确安装
+# MediaFlow Dockerfile
+# 多阶段构建优化
 
 # ============ 构建阶段 ============
 FROM python:3.10-slim as builder
@@ -9,24 +9,17 @@ WORKDIR /app
 # 安装编译依赖
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
-    g++ \
-    libc6-dev \
     libffi-dev \
-    libssl-dev \
     libxml2-dev \
-    libxslt1-dev \
-    zlib1g-dev \
+    libxslt-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# 先安装 ruamel.yaml（关键依赖）
+# 【2025-05-18 修复】先安装 ruamel.yaml，确保关键依赖优先安装
 RUN pip install --no-cache-dir --user 'ruamel.yaml>=0.17.32' 'ruamel.yaml.clib>=0.2.0'
 
 # 复制并安装其他依赖
 COPY requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
-
-# 验证 ruamel.yaml 安装
-RUN python -c "import ruamel.yaml; print('ruamel.yaml installed:', ruamel.yaml.__version__)"
 
 # ============ 运行阶段 ============
 FROM python:3.10-slim
@@ -37,21 +30,23 @@ LABEL description="MediaFlow - 新一代NAS媒体库智能管理系统"
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     MEDIAFLOW_HOME="/app" \
-    PATH="/root/.local/bin:$PATH" \
-    PYTHONPATH="/root/.local/lib/python3.10/site-packages:$PYTHONPATH"
+    PATH="/root/.local/bin:$PATH"
 
-# 安装运行时依赖
+# 【2025-05-18 修复】添加 PYTHONPATH 包含 /app 目录，确保模块导入正常
+ENV PYTHONPATH="/app:/root/.local/lib/python3.10/site-packages:$PYTHONPATH"
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     libxml2 \
     libxslt1.1 \
-    libffi8 \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd -m -u 1000 mediaflow
 
 WORKDIR /app
 
-# 从构建阶段复制所有 Python 包（关键修复）
+# 从构建阶段复制所有 Python 包
 COPY --from=builder /root/.local /root/.local
+COPY --from=builder /app/requirements.txt .
 
 # 复制项目文件
 COPY mediaflow ./mediaflow
@@ -62,14 +57,19 @@ COPY config.py .
 COPY log.py .
 COPY initializer.py .
 COPY version.py .
-COPY requirements.txt .
+
+# 【2025-05-18 修复】创建 app 软链接指向 mediaflow，解决 from app.xxx 导入问题
+RUN ln -s /app/mediaflow /app/app
 
 # 创建必要的目录
-RUN mkdir -p /app/data /app/logs /app/config
+RUN mkdir -p /app/data /app/logs /app/config \
+    && chown -R mediaflow:mediaflow /app
 
-# 最终验证
-RUN python -c "import ruamel.yaml; print('✓ ruamel.yaml available:', ruamel.yaml.__version__)" && \
-    python -c "from config import Config; print('✓ Config module loaded')"
+# 【2025-05-18 修复】验证关键依赖和模块导入正常
+RUN python -c "import ruamel.yaml; print('✓ ruamel.yaml OK')" && \
+    python -c "from app.brushtask import BrushTask; print('✓ app module OK')"
+
+USER mediaflow
 
 EXPOSE 3000
 
