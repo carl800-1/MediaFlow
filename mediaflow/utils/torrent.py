@@ -6,7 +6,13 @@ import tempfile
 import hashlib
 from urllib.parse import quote, unquote, urlencode, urlparse
 
-import libtorrent
+try:
+    import libtorrent
+    LIBTORRENT_AVAILABLE = True
+except ImportError:
+    libtorrent = None
+    LIBTORRENT_AVAILABLE = False
+
 try:
     from bencode import bencode, bdecode
 except ImportError:
@@ -305,6 +311,9 @@ class Torrent:
         :param timeout: 获取元数据超时时间
         :return: 转换后种子路径
         """
+        if not LIBTORRENT_AVAILABLE:
+            log.warn("【Downloader】libtorrent 未安装，无法转换磁力链接")
+            return None, "libtorrent 未安装"
 
         log.info(f"【Downloader】转换磁力链接：{url}")
         session = libtorrent.session()
