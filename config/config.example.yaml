@@ -6,6 +6,9 @@ app:
   log_level: "INFO"
   timezone: "Asia/Shanghai"
 
+security:
+  api_key: ""
+
 database:
   type: sqlite
   path: "data/mediaflow.db"
