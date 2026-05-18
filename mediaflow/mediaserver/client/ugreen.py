@@ -281,28 +281,24 @@ class Ugreen(_IMediaClient):
         """
         return None
 
-    def get_local_image_by_id(self, item_id, remote=True, inner=False):
+    def get_local_image_by_id(self, item_id):
         """
         根据ItemId查询本地图片地址
         """
         if not self._host or not self._token or not item_id:
             return None
-        
+
         try:
             req_url = self.__get_api_url(f"media/item/{item_id}/poster")
-            
-            if not remote:
-                return req_url
-            else:
-                host = self._play_host or self._host
-                image_url = f"{host}ugreen/v1/media/item/{item_id}/poster?token={self._token}"
-                if IpUtils.is_internal(host):
-                    return self.get_nt_image_url(url=image_url, remote=True)
-                return image_url
+            host = self._play_host or self._host
+            image_url = f"{host}ugreen/v1/media/item/{item_id}/poster?token={self._token}"
+            if IpUtils.is_internal(host):
+                return self.get_nt_image_url(url=image_url, remote=True)
+            return image_url
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
             log.error(f"【{self.client_name}】获取图片地址出错：{str(e)}")
-        
+
         return None
 
     def refresh_root_library(self):
@@ -372,7 +368,7 @@ class Ugreen(_IMediaClient):
                             continue
                         
                         library_id = library.get('id', '')
-                        image = self.get_local_image_by_id(library_id, remote=False, inner=True)
+                        image = self.get_local_image_by_id(library_id)
                         
                         libraries.append({
                             "id": library_id,
@@ -492,7 +488,7 @@ class Ugreen(_IMediaClient):
                         
                         item_id = item.get('id')
                         link = self.get_play_url(item_id)
-                        image = self.get_local_image_by_id(item_id, remote=False, inner=True)
+                        image = self.get_local_image_by_id(item_id)
                         
                         ret_latest.append({
                             "id": item_id,

@@ -7,6 +7,7 @@ from typing import Any, Dict, Optional, Union
 from cachetools import cached, TTLCache
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session, Session
+from sqlalchemy.pool import QueuePool
 
 from app.db.models import BaseMedia, MEDIASYNCITEMS, MEDIASYNCSTATISTIC
 from app.utils import ExceptionUtils

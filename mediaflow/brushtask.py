@@ -150,9 +150,64 @@ class BrushTask(object):
         """
         if not taskid:
             return
+        # 任务信息
         taskinfo = self.get_brushtask_info(taskid)
         if not taskinfo:
             return
+        # 任务属性
+        seed_size = taskinfo.get("seed_size")
+        task_name = taskinfo.get("name")
+        site_id = taskinfo.get("site_id")
+        rss_url = taskinfo.get("rss_url")
+        rss_rule = taskinfo.get("rss_rule")
+        cookie = taskinfo.get("cookie")
+        rss_free = taskinfo.get("free")
+        ua = taskinfo.get("ua")
+        # 查询站点信息
+        site_info = self.sites.get_sites(siteid=site_id)
+        if not site_info:
+            log.error("【Brush】刷流任务 %s 的站点已不存在，无法刷流！" % task_name)
+            return
+        site_name = site_info.get("name")
+        site_proxy = site_info.get("proxy")
+
+        if not rss_url:
+            log.error("【Brush】站点 %s 未配置RSS订阅地址，无法刷流！" % site_name)
+            return
+        if rss_free and not cookie:
+            log.warn("【Brush】站点 %s 未配置Cookie，无法开启促销刷流" % site_name)
+            return
+        # 下载器参数
+        downloader_cfg = self.get_downloader_info(taskinfo.get("downloader"))
+        if not downloader_cfg:
+            log.error("【Brush】任务 %s 下载器不存在，无法刷流！" % task_name)
+            return
+
+        log.info("【Brush】开始站点 %s 的刷流任务：%s..." % (site_name, task_name))
+        # 检查是否达到保种体积
+        if not self.__is_allow_new_torrent(taskid=taskid,
+                                           taskname=task_name,
+                                           seedsize=seed_size,
+                                           downloadercfg=downloader_cfg,
+                                           dlcount=rss_rule.get("dlcount")):
+            return
+
+        rss_result = Rss.parse_rssxml(rss_url)
+        if len(rss_result) == 0:
+            log.warn("【Brush】%s RSS未下载到数据" % site_name)
+            return
+        else:
+            log.info("【Brush】%s RSS获取数据：%s" % (site_name, len(rss_result)))
+
+        max_dlcount = rss_rule.get("dlcount")
+        success_count = 0
+        if max_dlcount:
+            downloading_count = self.__get_downloading_count(downloader_cfg) or 0
+            new_torrent_count = int(max_dlcount) - int(downloading_count)
+
+        for res in rss_result:
+            try:
+                # 种子名
                 torrent_name = res.get('title')
                 # 种子链接
                 enclosure = res.get('enclosure')
@@ -169,46 +224,30 @@ class BrushTask(object):
                     log.debug("【Brush】%s 已处理过" % torrent_name)
                     continue
 
-                # 检查种子种包含的免费限时信息
-                torrent_attr = self.siteconf.check_torrent_attr(torrent_url=page_url,
-                                                                cookie=cookie,
-                                                                ua=ua,
-                                                                proxy=site_proxy)
-
                 # 检查种子是否符合选种规则
                 if not self.__check_rss_rule(rss_rule=rss_rule,
                                              title=torrent_name,
-                                             torrent_attr=torrent_attr,
+                                             torrent_url=page_url,
                                              torrent_size=size,
                                              pubdate=pubdate,
-                                             siteid=site_id):
+                                             cookie=cookie,
+                                             ua=ua,
+                                             proxy=site_proxy):
                     continue
-                # 检查能否添加当前种子，判断是否超过保种体积大小
-                if not self.__is_allow_new_torrent(taskinfo=taskinfo,
-                                                   dlcount=max_dlcount,
-                                                   torrent_size=size,
-                                                   current_site_count=current_site_count,
-                                                   current_site_dlcount=current_site_dlcount,
-                                                   site_info=site_info):
-                    continue
-                # 检查是否已处理过
-                if self.is_torrent_handled(enclosure=enclosure):
-                    log.info("【Brush】%s 已在刷流任务中" % torrent_name)
-                    continue
-
-
-
                 # 开始下载
                 log.debug("【Brush】%s 符合条件，开始下载..." % torrent_name)
-                if self.__download_torrent(taskinfo=taskinfo,
-                                           rss_rule=rss_rule,
-                                           fraction_rule=fraction_rule,
-                                           site_info=site_info,
+                if self.__download_torrent(downloadercfg=downloader_cfg,
                                            title=torrent_name,
                                            enclosure=enclosure,
                                            size=size,
-                                           torrent_attr=torrent_attr,
-                                           ):
+                                           taskid=taskid,
+                                           transfer=True if taskinfo.get("transfer") == 'Y' else False,
+                                           sendmessage=True if taskinfo.get("sendmessage") == 'Y' else False,
+                                           forceupload=True if taskinfo.get("forceupload") == 'Y' else False,
+                                           upspeed=rss_rule.get("upspeed"),
+                                           downspeed=rss_rule.get("downspeed"),
+                                           taskname=task_name,
+                                           site_info=site_info):
                     # 计数
                     success_count += 1
                     # 添加种子后不能超过最大下载数量
@@ -216,16 +255,12 @@ class BrushTask(object):
                         break
 
                     # 再判断一次
-                    if not self.__is_torrent_size_match(taskinfo):
+                    if not self.__is_allow_new_torrent(taskid=taskid,
+                                                       taskname=task_name,
+                                                       seedsize=seed_size,
+                                                       dlcount=rss_rule.get("dlcount"),
+                                                       downloadercfg=downloader_cfg):
                         break
-
-                    if not self.__is_allow_new_torrent(taskinfo=taskinfo,
-                                                       dlcount=max_dlcount,
-                                                       current_site_count=current_site_count,
-                                                       current_site_dlcount=current_site_dlcount,
-                                                       site_info=site_info):
-                        break
-                    self._torrents_cache.append(enclosure)
             except Exception as err:
                 ExceptionUtils.exception_traceback(err)
                 continue
