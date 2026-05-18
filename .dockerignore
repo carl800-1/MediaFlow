@@ -60,6 +60,7 @@ config/*.yml
 config/*.json
 !config/config.yaml.example
 !config/config.yaml.sample
+!config/config.example.yaml
 
 # OS
 .DS_Store
