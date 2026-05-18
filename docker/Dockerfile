@@ -60,7 +60,7 @@ COPY log.py .
 COPY initializer.py .
 COPY version.py .
 COPY third_party.txt .
-COPY config/config.example.yaml /app/config/config.example.yaml
+COPY config/config.example.yaml ./config/config.example.yaml
 
 # 创建必要的目录、符号链接和默认配置
 RUN mkdir -p /app/data /app/logs && \
