@@ -28,7 +28,8 @@ echo_warning() {
 build_docker() {
     echo_step "开始构建 Docker 镜像..."
     
-    docker build -t mediaflow:latest .
+    docker build -t mediaflow:latest \
+        -f docker/Dockerfile .
     
     echo_step "Docker 镜像构建完成!"
 }

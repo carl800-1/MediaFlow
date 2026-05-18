@@ -4,7 +4,7 @@ services:
   mediaflow:
     build:
       context: ..
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     container_name: mediaflow
     restart: unless-stopped
     ports:
