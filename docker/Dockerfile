@@ -7,7 +7,8 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     MEDIAFLOW_HOME="/app" \
     PATH="/root/.local/bin:$PATH" \
-    PYTHONPATH="/app"
+    PYTHONPATH="/app" \
+    NASTOOL_CONFIG="/app/config/config.yaml"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
@@ -33,8 +34,9 @@ COPY initializer.py .
 COPY version.py .
 COPY third_party.txt .
 
-# 创建软链接
-RUN ln -s /app/mediaflow /app/app
+# 创建软链接和默认配置
+RUN ln -s /app/mediaflow /app/app && \
+    cp /app/config/config.example.yaml /app/config/config.yaml
 
 RUN mkdir -p /app/data /app/logs /app/config && chown -R mediaflow:mediaflow /app
 
