@@ -26,19 +26,19 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY mediaflow ./mediaflow
 COPY web ./web
-COPY config ./config
 COPY run.py .
 COPY config.py .
 COPY log.py .
 COPY initializer.py .
 COPY version.py .
 COPY third_party.txt .
+COPY config/config.example.yaml /app/config/config.example.yaml
 
 # 创建软链接和默认配置
 RUN ln -s /app/mediaflow /app/app && \
     cp /app/config/config.example.yaml /app/config/config.yaml
 
-RUN mkdir -p /app/data /app/logs /app/config && chown -R mediaflow:mediaflow /app
+RUN mkdir -p /app/data /app/logs && chown -R mediaflow:mediaflow /app
 
 USER mediaflow
 
