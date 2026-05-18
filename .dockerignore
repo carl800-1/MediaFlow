@@ -4,7 +4,7 @@
 .gitattributes
 
 # Python
-__pycache__
+__pycache__/
 *.py[cod]
 *$py.class
 *.so
@@ -29,6 +29,7 @@ wheels/
 venv/
 ENV/
 env/
+.venv
 
 # IDE
 .vscode/
@@ -36,40 +37,45 @@ env/
 *.swp
 *.swo
 *~
-.DS_Store
 
 # Testing
-.coverage
 .pytest_cache/
+.coverage
 htmlcov/
 .tox/
 
 # Documentation
-docs/
-*.md
-!requirements.txt
+docs/_build/
+
+# Data and logs (will be mounted as volumes)
+data/
+logs/
+*.db
+*.sqlite
+*.sqlite3
+
+# Config (will be mounted as volume, but keep example configs)
+config/*.yaml
+config/*.yml
+config/*.json
+!config/config.yaml.example
+!config/config.yaml.sample
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Docker
-docker-compose*.yml
+Dockerfile
+docker-compose.yml
+.dockerignore
 
 # CI/CD
 .github/
-!.github/workflows/
 .travis.yml
 .gitlab-ci.yml
 
-# MediaFlow specific
-data/
-logs/
-*.log
-.env
-.env.local
-
-# macOS
-._*
-.DS_Store
-
 # Temporary files
 *.tmp
-*.bak
-*.cache
+*.temp
+*.log
