@@ -31,6 +31,7 @@ COPY config.py .
 COPY log.py .
 COPY initializer.py .
 COPY version.py .
+COPY third_party.txt .
 
 # 创建软链接
 RUN ln -s /app/mediaflow /app/app
