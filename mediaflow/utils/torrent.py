@@ -13,10 +13,18 @@ except ImportError:
     libtorrent = None
     LIBTORRENT_AVAILABLE = False
 
+# bencode 导入 - 优先使用 bencode.py（不需要 BTL）
 try:
-    from bencode import bencode, bdecode
+    from bencodepy import encode as bencode, decode as bdecode
 except ImportError:
-    from bencode import encode as bencode, decode as bdecode
+    try:
+        from bencode import bencode, bdecode
+    except ImportError:
+        try:
+            from bencode import encode as bencode, decode as bdecode
+        except ImportError:
+            bencode = None
+            bdecode = None
 
 import log
 from app.utils import StringUtils
