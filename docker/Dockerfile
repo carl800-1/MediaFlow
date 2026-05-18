@@ -21,6 +21,9 @@ RUN pip install --no-cache-dir --user 'ruamel.yaml>=0.17.32' 'ruamel.yaml.clib>=
 COPY requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
+# 【2025-05-18 修复】验证 builder 阶段安装成功
+RUN python -c "import ruamel.yaml; print('Builder: ruamel.yaml OK')"
+
 # ============ 运行阶段 ============
 FROM python:3.10-slim
 
@@ -32,8 +35,8 @@ ENV PYTHONUNBUFFERED=1 \
     MEDIAFLOW_HOME="/app" \
     PATH="/root/.local/bin:$PATH"
 
-# 【2025-05-18 修复】添加 PYTHONPATH 包含 /app 目录，确保模块导入正常
-ENV PYTHONPATH="/app:/root/.local/lib/python3.10/site-packages:$PYTHONPATH"
+# 【2025-05-18 修复】添加 PYTHONPATH 包含 /app 目录
+ENV PYTHONPATH="/app:/root/.local/lib/python3.10/site-packages"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -58,16 +61,21 @@ COPY log.py .
 COPY initializer.py .
 COPY version.py .
 
-# 【2025-05-18 修复】创建 app 软链接指向 mediaflow，解决 from app.xxx 导入问题
+# 【2025-05-18 修复】创建 app 软链接指向 mediaflow
 RUN ln -s /app/mediaflow /app/app
 
 # 创建必要的目录
 RUN mkdir -p /app/data /app/logs /app/config \
     && chown -R mediaflow:mediaflow /app
 
-# 【2025-05-18 修复】验证关键依赖和模块导入正常
-RUN python -c "import ruamel.yaml; print('✓ ruamel.yaml OK')" && \
-    python -c "from app.brushtask import BrushTask; print('✓ app module OK')"
+# 【2025-05-18 修复】分步验证，便于排查问题
+RUN echo "=== 验证 ruamel.yaml ===" && \
+    python -c "import ruamel.yaml; print('✓ ruamel.yaml OK, version:', ruamel.yaml.__version__)" && \
+    echo "=== 验证 app 软链接 ===" && \
+    ls -la /app/ && \
+    echo "=== 验证 app.brushtask ===" && \
+    python -c "from app.brushtask import BrushTask; print('✓ app.brushtask OK')" && \
+    echo "=== 所有验证通过 ==="
 
 USER mediaflow
 
