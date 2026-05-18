@@ -63,9 +63,11 @@ COPY log.py .
 COPY initializer.py .
 COPY version.py .
 COPY requirements.txt .
+COPY third_party.txt .
 
-# 创建必要的目录
-RUN mkdir -p /app/data /app/logs /app/config
+# 创建必要的目录和符号链接
+RUN mkdir -p /app/data /app/logs /app/config && \
+    ln -sf mediaflow app
 
 # 最终验证
 RUN python -c "import ruamel.yaml; print('✓ ruamel.yaml available:', ruamel.yaml.__version__)" && \
