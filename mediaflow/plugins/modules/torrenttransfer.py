@@ -8,8 +8,12 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 try:
     from bencode import bencode, bdecode
-except ImportError:
-    from bencode import encode as bencode, decode as bdecode
+except (ImportError, Exception):
+    try:
+        from bencode import encode as bencode, decode as bdecode
+    except (ImportError, Exception):
+        bencode = None
+        bdecode = None
 
 from app.downloader import Downloader
 from app.media.meta import MetaInfo
