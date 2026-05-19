@@ -177,6 +177,8 @@ class SystemConfigKey(Enum):
     UserScraperConf = "UserScraperConf"
     # 索引站点
     UserIndexerSites = "UserIndexerSites"
+    # 绿联影视会话缓存
+    UgreenSessionCache = "UgreenSessionCache"
 
 # 处理进度Key字典
 class ProgressKey(Enum):

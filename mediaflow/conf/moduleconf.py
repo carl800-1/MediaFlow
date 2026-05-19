@@ -950,14 +950,15 @@ class ModuleConf(object):
                     "id": "ugreen.host",
                     "required": True,
                     "title": "服务器地址",
-                    "tooltip": "配置IP地址和端口，如为https则需要增加https://前缀",
+                    "tooltip": "配置绿联NAS的IP地址和端口，如为https则需要增加https://前缀",
                     "type": "text",
-                    "placeholder": "http://127.0.0.1"
+                    "placeholder": "https://192.168.1.100"
                 },
                 "username": {
                     "id": "ugreen.username",
                     "required": True,
                     "title": "用户名",
+                    "tooltip": "绿联NAS登录用户名",
                     "type": "text",
                     "placeholder": ""
                 },
@@ -965,6 +966,7 @@ class ModuleConf(object):
                     "id": "ugreen.password",
                     "required": True,
                     "title": "密码",
+                    "tooltip": "绿联NAS登录密码",
                     "type": "password",
                     "placeholder": ""
                 },
@@ -974,7 +976,29 @@ class ModuleConf(object):
                     "title": "媒体播放地址",
                     "tooltip": "配置播放设备的访问地址，用于媒体详情页跳转播放页面；如为https则需要增加https://前缀，留空则默认与服务器地址一致",
                     "type": "text",
-                    "placeholder": "http://127.0.0.1"
+                    "placeholder": "https://192.168.1.100"
+                },
+                "scan_mode": {
+                    "id": "ugreen.scan_mode",
+                    "required": False,
+                    "title": "扫描模式",
+                    "tooltip": "媒体库扫描模式：1=新添加和修改、2=补充缺失（默认）、3=覆盖扫描",
+                    "type": "select",
+                    "options": [
+                        {"value": "", "name": "补充缺失（默认）"},
+                        {"value": "1", "name": "新添加和修改"},
+                        {"value": "2", "name": "补充缺失"},
+                        {"value": "3", "name": "覆盖扫描"}
+                    ],
+                    "default": ""
+                },
+                "verify_ssl": {
+                    "id": "ugreen.verify_ssl",
+                    "required": False,
+                    "title": "SSL证书校验",
+                    "tooltip": "是否校验HTTPS证书，使用自签证书时需关闭",
+                    "type": "switch",
+                    "default": True
                 }
             }
         },
