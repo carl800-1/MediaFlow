@@ -3,6 +3,7 @@ aniso8601>=9.0.0
 anitopy>=2.1.0
 APScheduler>=3.10.0
 asttokens>=2.2.0
+feapder>=1.8.0
 async-generator>=1.10
 attrs>=23.1.0
 backcall>=0.2.0
