@@ -34,6 +34,9 @@ def update_db():
     db_location = os.path.normpath(os.path.join(Config().get_config_path(), 'user.db'))
     script_location = os.path.normpath(os.path.join(Config().get_root_path(), 'scripts'))
     log.console('开始更新数据库...')
+    if not os.path.exists(script_location):
+        log.console('数据库更新跳过：scripts 目录不存在')
+        return
     try:
         alembic_cfg = AlembicConfig()
         alembic_cfg.set_main_option('script_location', script_location)

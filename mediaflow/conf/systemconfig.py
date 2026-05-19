@@ -11,6 +11,7 @@ class SystemConfig:
     systemconfig: Dict[str, Any]
 
     def __init__(self):
+        self.systemconfig = {}
         self.dicthelper = DictHelper()
         self.init_config()
 

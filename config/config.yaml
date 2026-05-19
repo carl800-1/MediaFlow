@@ -1,10 +1,89 @@
 app:
   debug: false
-  host: "0.0.0.0"
-  port: 3000
+  logtype: "console"
+  loglevel: "INFO"
+  web_port: 3000
+  ssl_cert: ""
+  ssl_key: ""
   secret_key: "change-me-in-production"
-  log_level: "INFO"
+  proxy: ""
+  tmdb_domain: "api.tmdb.org"
+  rmt_tmdbkey: ""
+  rmt_match_mode: "normal"
   timezone: "Asia/Shanghai"
+
+security:
+  api_key: ""
+
+pt:
+  pt_monitor: false
+  pt_check_interval: 300
+  search_rss_interval: 6
+  ptsignin_cron: ""
+  ptrefresh_date_cron: "6"
+
+media:
+  movie_path:
+    - ""
+  tv_path:
+    - ""
+  anime_path:
+    - ""
+  unknown_path: ""
+  category: ""
+  min_filesize: 150
+  movie_name_format: "{title} ({year})/{title} ({year})-{part} - {videoFormat}"
+  tv_name_format: "{title} ({year})/Season {season}/{title} - {season_episode}-{part} - 第 {episode} 集"
+  anime_name_format: "{title} ({year})/Season {season}/{title} - {season_episode}-{part} - 第 {episode} 集"
+  nfo_poster: false
+  refresh_mediaserver: true
+  mediasync_interval: 12
+
+laboratory:
+  tmdb_proxy: ""
+
+subtitle:
+  server: ""
+
+scraper_nfo:
+  movie:
+    basic: true
+    credits: true
+    credits_chinese: false
+  tv:
+    basic: true
+    credits: true
+    credits_chinese: false
+    season_basic: true
+    episode_basic: true
+    episode_credits: true
+
+scraper_pic:
+  movie:
+    poster: true
+    backdrop: true
+    background: false
+    logo: false
+    disc: false
+    banner: false
+    thumb: false
+  tv:
+    poster: true
+    backdrop: true
+    background: false
+    logo: false
+    disc: false
+    banner: false
+    thumb: false
+    season_poster: true
+    season_banner: false
+    season_backdrop: false
+    episode_thumb: false
+
+ocr:
+  custom_ocr_url: ""
+  baiduocr_api_key: ""
+  baiduocr_secret_key: ""
 
 database:
   type: sqlite

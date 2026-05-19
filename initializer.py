@@ -218,7 +218,7 @@ def update_config():
 
     # 站点数据刷新时间默认配置
     try:
-        if "ptrefresh_date_cron" not in _config['pt']:
+        if _config.get('pt') and "ptrefresh_date_cron" not in _config['pt']:
             _config['pt']['ptrefresh_date_cron'] = '6'
             overwrite_cofig = True
     except Exception as e:
@@ -270,18 +270,18 @@ def update_config():
 
     # 内建索引器配置改为存数据库
     try:
-        indexer_sites = Config().get_config("pt").get("indexer_sites")
+        indexer_sites = (Config().get_config("pt") or {}).get("indexer_sites")
         if indexer_sites:
             SystemConfig().set(SystemConfigKey.UserIndexerSites,
                                indexer_sites)
-            _config['pt'].pop("indexer_sites")
+            _config.get('pt', {}).pop("indexer_sites", None)
             overwrite_cofig = True
     except Exception as e:
         ExceptionUtils.exception_traceback(e)
 
     # 站点签到转为插件
     try:
-        ptsignin_cron = Config().get_config("pt").get("ptsignin_cron")
+        ptsignin_cron = (Config().get_config("pt") or {}).get("ptsignin_cron")
         if ptsignin_cron:
             # 转换周期
             ptsignin_cron = str(ptsignin_cron).strip()
@@ -313,7 +313,7 @@ def update_config():
                 "onlyonce": False,
                 "queue_cnt": 10
             })
-            _config['pt'].pop("ptsignin_cron")
+            _config.get('pt', {}).pop("ptsignin_cron", None)
             overwrite_cofig = True
     except Exception as e:
         ExceptionUtils.exception_traceback(e)

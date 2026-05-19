@@ -43,8 +43,8 @@ class MainDb:
         try:
             self.excute("delete from alembic_version where 1")
             self.commit()
-        except Exception as err:
-            print(str(err))
+        except Exception:
+            pass
 
     def init_data(self) -> None:
         """
