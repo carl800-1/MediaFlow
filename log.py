@@ -31,8 +31,8 @@ class Logger:
         self.logger = logging.getLogger(module)
         self.__config = Config()
         logtype = self.__config.get_config('app').get('logtype') or "console"
-        loglevel = self.__config.get_config('app').get('loglevel') or "info"
-        self.logger.setLevel(level=self.__loglevels.get(loglevel))
+        loglevel = (self.__config.get_config('app').get('loglevel') or "info").lower()
+        self.logger.setLevel(level=self.__loglevels.get(loglevel, logging.INFO))
         if logtype == "server":
             logserver = self.__config.get_config('app').get('logserver', '').split(':')
             if logserver:
