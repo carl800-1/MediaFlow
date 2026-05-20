@@ -6,7 +6,7 @@ FROM python:3.10-slim as builder
 
 WORKDIR /app
 
-# 安装编译依赖
+# 安装编译依赖（包含 Python 包编译所需的全部系统库）
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
@@ -16,6 +16,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxml2-dev \
     libxslt1-dev \
     zlib1g-dev \
+    python3-dev \
+    libpq-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libfreetype6-dev \
+    liblcms2-dev \
+    libopenjp2-7-dev \
+    libtiff5-dev \
+    libwebp-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 先安装 ruamel.yaml（关键依赖）
@@ -44,6 +55,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxml2 \
     libxslt1.1 \
     libffi8 \
+    libjpeg62-turbo \
+    libpng16-16 \
+    libfreetype6 \
+    liblcms2-2 \
+    libopenjp2-7 \
+    libtiff6 \
+    libwebp7 \
+    libharfbuzz0b \
+    libfribidi0 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
