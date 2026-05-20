@@ -1,0 +1,203 @@
+name: Docker Build
+
+# ============================================================
+# Docker 镜像构建主流程
+#
+# 触发条件:
+#   - push 到 main 分支
+#   - 创建版本标签 v*
+#   - PR 到 main 分支
+#   - 手动触发
+#
+# 镜像标签规则:
+#   main 分支: latest, main
+#   版本标签: v1.0.0, v1.0, latest
+#   feature 分支: branch-{name}
+#   PR: pr-{number} (仅构建不推送)
+# ============================================================
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+      - 'bugfix/**'
+      - 'hotfix/**'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: '指定构建分支'
+        required: false
+        default: ''
+        type: string
+      push_image:
+        description: '是否推送镜像'
+        required: false
+        default: true
+        type: boolean
+      platforms:
+        description: '构建平台'
+        required: false
+        default: 'linux/amd64,linux/arm64'
+        type: string
+
+env:
+  REGISTRY_GHCR: ghcr.io
+  REGISTRY_DOCKERHUB: docker.io
+  IMAGE_NAME: ${{ github.repository }}
+  DOCKERFILE: ./docker/Dockerfile
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # --------------------------------------------------
+      # 1. 检出代码
+      # --------------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # --------------------------------------------------
+      # 2. 获取版本信息
+      # --------------------------------------------------
+      - name: Get version info
+        id: version
+        run: |
+          # 读取 version.py 获取版本号
+          if [ -f version.py ]; then
+            APP_VERSION=$(grep -oP "APP_VERSION\s*=\s*['\"]\K[^'\"]+" version.py || echo "")
+            echo "app_version=$APP_VERSION" >> $GITHUB_OUTPUT
+          fi
+
+          # 确定是否是主分支
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "is_main=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_main=false" >> $GITHUB_OUTPUT
+          fi
+
+          # 确定是否是标签
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "is_tag=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_tag=false" >> $GITHUB_OUTPUT
+          fi
+
+          echo "short_sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      # --------------------------------------------------
+      # 3. 设置 QEMU 和 Buildx
+      # --------------------------------------------------
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # --------------------------------------------------
+      # 4. 登录镜像仓库
+      # --------------------------------------------------
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY_GHCR }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to DockerHub
+        if: secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_PASSWORD != ''
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      # --------------------------------------------------
+      # 5. 生成镜像标签
+      # --------------------------------------------------
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY_GHCR }}/${{ env.IMAGE_NAME }}
+            ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_PASSWORD != '' && format('{0}/{1}', secrets.DOCKERHUB_USERNAME, 'mediaflow') || '' }}
+          tags: |
+            # main 分支: latest + main
+            type=raw,value=latest,enable=${{ steps.version.outputs.is_main == 'true' }}
+            type=raw,value=main,enable=${{ steps.version.outputs.is_main == 'true' }}
+            
+            # 版本标签: v1.0.0 + v1.0 + latest
+            type=semver,pattern={{version}},enable=${{ steps.version.outputs.is_tag == 'true' }}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ steps.version.outputs.is_tag == 'true' }}
+            type=raw,value=latest,enable=${{ steps.version.outputs.is_tag == 'true' }}
+            
+            # feature/bugfix/hotfix 分支: branch-{name}
+            type=ref,event=branch,prefix=branch-
+            
+            # PR: pr-{number} (仅构建)
+            type=ref,event=pr,prefix=pr-
+            
+            # commit SHA
+            type=sha,prefix=,suffix=,enable=${{ github.event_name != 'pull_request' }}
+
+      # --------------------------------------------------
+      # 6. 构建并推送镜像
+      # --------------------------------------------------
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ env.DOCKERFILE }}
+          platforms: ${{ github.event.inputs.platforms || 'linux/amd64,linux/arm64' }}
+          push: ${{ github.event.inputs.push_image != 'false' && github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ github.workflow }}
+          cache-to: type=gha,mode=max,scope=${{ github.workflow }}
+
+      # --------------------------------------------------
+      # 7. 输出镜像信息
+      # --------------------------------------------------
+      - name: Image info
+        run: |
+          echo "✅ Docker 镜像构建完成"
+          echo ""
+          echo "📦 镜像标签:"
+          echo "${{ steps.meta.outputs.tags }}" | while read tag; do
+            [ -n "$tag" ] && echo "   $tag"
+          done
+          echo ""
+          echo "🔧 测试命令:"
+          echo "   docker pull ${{ env.REGISTRY_GHCR }}/${{ env.IMAGE_NAME }}:latest"
+
+      # --------------------------------------------------
+      # 8. 创建 Release (仅标签触发)
+      # --------------------------------------------------
+      - name: Create Release
+        if: steps.version.outputs.is_tag == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.version.outputs.app_version }}
+          body: |
+            ## Docker 镜像
+
+            ```bash
+            docker pull ${{ env.REGISTRY_GHCR }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.app_version }}
+            ```
+
+            ## 更新日志
+
+            详见 [Commits](https://github.com/${{ github.repository }}/commits/${{ github.ref }})
+          draft: false
+          prerelease: false
