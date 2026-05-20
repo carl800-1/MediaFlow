@@ -28,12 +28,18 @@ jobs:
           echo "Checking project structure..."
           ls -la mediaflow/
           echo "Required directories exist"
-          test -d mediaflow/brushtask
-          test -d mediaflow/database
+          test -d mediaflow/conf
+          test -d mediaflow/db
           test -d mediaflow/downloader
+          test -d mediaflow/helper
+          test -d mediaflow/indexer
+          test -d mediaflow/media
           test -d mediaflow/mediaserver
-          test -d mediaflow/scraper
-          test -d mediaflow/web
+          test -d mediaflow/message
+          test -d mediaflow/plugins
+          test -d mediaflow/sites
+          test -d mediaflow/utils
+          test -d web
           echo "All required modules exist"
 
       - name: Verify Python syntax
