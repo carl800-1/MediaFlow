@@ -2,7 +2,7 @@
 # 多阶段构建优化，确保依赖正确安装
 
 # ============ 构建阶段 ============
-FROM python:3.10-slim as builder
+FROM python:3.10-slim AS builder
 
 WORKDIR /app
 
@@ -45,8 +45,8 @@ LABEL description="MediaFlow - 新一代NAS媒体库智能管理系统"
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     MEDIAFLOW_HOME="/app" \
-    PATH="/root/.local/bin:$PATH" \
-    PYTHONPATH="/root/.local/lib/python3.10/site-packages:$PYTHONPATH" \
+    PATH="/root/.local/bin:/usr/local/bin:/usr/bin:$PATH" \
+    PYTHONPATH="/root/.local/lib/python3.10/site-packages" \
     NASTOOL_CONFIG="/app/config/config.yaml"
 
 # 安装运行时依赖
